@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Edit Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        
+        :root {
+            --primary: #8b5ceb;
+            --primary-dark: #6c3dc7;
+            --secondary: #00d4ff;
+            --accent: #ff6b9d;
+            --background: #0f0f1e;
+            --surface: #1a1a2e;
+            --surface-light: #252547;
+            --text: #e2e2f7;
+            --text-secondary: #a0a0c0;
+            --success: #00e6a0;
+            --warning: #ffb84d;
+            --error: #ff4d7d;
+            --border: rgba(139, 92, 235, 0.2);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --glow: 0 0 20px rgba(139, 92, 235, 0.4);
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--background) 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: var(--text);
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(139, 92, 235, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(255, 107, 157, 0.05) 0%, transparent 30%);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: var(--shadow), var(--glow);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(139, 92, 235, 0.05) 0%, rgba(0, 212, 255, 0.05) 100%);
+            z-index: -1;
+        }
+        
+        header {
+            background: linear-gradient(90deg, var(--surface) 0%, var(--surface-light) 100%);
+            padding: 30px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(139, 92, 235, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(139, 92, 235, 0.4);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        @media (max-width: 1100px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .section {
+            background: rgba(37, 37, 71, 0.5);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(139, 92, 235, 0.2);
+        }
+        
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        
+        .section-title i {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 1rem;
+        }
+        
+        .input-container {
+            position: relative;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(26, 26, 46, 0.7);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 235, 0.2);
+        }
+        
+        textarea {
+            min-height: 220px;
+            resize: vertical;
+            font-family: 'Fira Code', monospace;
+            line-height: 1.5;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 16px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s;
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(139, 92, 235, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(139, 92, 235, 0.6);
+        }
+        
+        .btn-secondary {
+            background: rgba(37, 37, 71, 0.7);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(37, 37, 71, 1);
+            border-color: var(--primary);
+        }
+        
+        .btn-success {
+            background: linear-gradient(90deg, var(--success) 0%, #00c490 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 230, 160, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(90deg, var(--warning) 0%, #ffa533 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 184, 77, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(90deg, var(--error) 0%, #ff3366 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 77, 125, 0.4);
+        }
+        
+        .btn-info {
+            background: linear-gradient(90deg, var(--secondary) 0%, #00b8e6 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .success {
+            background: rgba(0, 230, 160, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(0, 230, 160, 0.3);
+        }
+        
+        .error {
+            background: rgba(255, 77, 125, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(255, 77, 125, 0.3);
+        }
+        
+        .url-list {
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        /* Custom scrollbar */
+        .url-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .url-list::-webkit-scrollbar-track {
+            background: rgba(26, 26, 46, 0.5);
+            border-radius: 10px;
+        }
+        
+        .url-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+        
+        .url-item {
+            background: rgba(26, 26, 46, 0.7);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .url-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: rgba(139, 92, 235, 0.4);
+        }
+        
+        .url-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        }
+        
+        .url-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .url-name {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .url-name i {
+            color: var(--primary);
+        }
+        
+        .url-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .url-actions button {
+            padding: 10px 16px;
+            font-size: 0.85rem;
+        }
+        
+        .url-meta {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
+        .json-preview {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(26, 26, 46, 0.7);
+            border-radius: 12px;
+            border: 1px dashed var(--border);
+            display: none;
+        }
+        
+        pre {
+            white-space: pre-wrap;
+            font-family: 'Fira Code', monospace;
+            background: rgba(15, 15, 30, 0.8);
+            color: var(--text);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 30px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+        
+        .empty-state p {
+            font-size: 1rem;
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+            background: rgba(26, 26, 46, 0.5);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+                gap: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .url-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .url-actions {
+                margin-top: 15px;
+                width: 100%;
+            }
+            
+            .url-actions button {
+                flex: 1;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+        
+        /* Animation for new items */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease;
+        }
+        
+        /* Pulse animation for buttons */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(139, 92, 235, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(139, 92, 235, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(139, 92, 235, 0);
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Find feature styles */
+        .find-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .find-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(26, 26, 46, 0.7);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+        
+        .find-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .find-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .find-btn {
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            background: rgba(37, 37, 71, 0.7);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .find-btn:hover {
+            background: rgba(37, 37, 71, 1);
+            border-color: var(--primary);
+        }
+        
+        .find-results {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            text-align: right;
+        }
+        
+        .highlight {
+            background-color: rgba(255, 184, 77, 0.3);
+            border-radius: 3px;
+            padding: 1px 3px;
+        }
+        
+        .current-highlight {
+            background-color: rgba(255, 107, 157, 0.5);
+            border-radius: 3px;
+            padding: 1px 3px;
+        }
+        
+        /* Enhanced textarea with find results */
+        .textarea-container {
+            position: relative;
+        }
+        
+        .find-match-count {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(26, 26, 46, 0.8);
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            display: none;
+        }
+        
+        .find-active .find-match-count {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h1>JSON Edit Pro</h1>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="section">
+                <div class="form-group">
+                    <label for="urlName">Entry Name</label>
+                    <div class="input-container">
+                        <input type="text" id="urlName" placeholder="Give a descriptive name for your JSON data">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nodeName">Database Node Name</label>
+                    <input type="text" id="nodeName" placeholder="e.g., users, products, orders">
+                </div>
+                
+                <div class="form-group">
+                    <label for="findInput">Find JSON</label>
+                    <div class="find-container">
+                        <input type="text" id="findInput" class="find-input" placeholder="Json Find...">
+                        <div class="find-buttons">
+                            <button class="find-btn" id="findPrevBtn">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button class="find-btn" id="findNextBtn">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="find-results" id="findResults"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="jsonData">JSON Data</label>
+                    <div class="textarea-container" id="jsonDataContainer">
+                        <textarea id="jsonData" placeholder='Enter valid JSON data'></textarea>
+                        <div class="find-match-count" id="findMatchCount"></div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-primary pulse" id="storeBtn">
+                        <i class="fas fa-bolt"></i> Generate JSON URL
+                    </button>
+                    <button class="btn-secondary" id="validateBtn">
+                        <i class="fas fa-check-circle"></i> Validate JSON
+                    </button>
+                    <button class="btn-secondary" id="clearBtn">
+                        <i class="fas fa-eraser"></i> Clear Editor
+                    </button>
+                </div>
+                
+                <div id="statusMessage" class="status"></div>
+                
+                <!-- JSON Preview is completely removed from the UI -->
+            </div>
+            
+            <div class="section">
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalCount">0</div>
+                        <div class="stat-label">Total URLs</div>
+                    </div>
+                </div>
+                
+                <div class="url-list" id="urlList">
+                    <div class="empty-state" id="emptyState">
+                        <i class="fas fa-link-slash"></i>
+                        <h3>No JSON URLs</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            databaseURL: "https://adr-catering-default-rtdb.firebaseio.com"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // DOM elements
+        const urlNameInput = document.getElementById('urlName');
+        const nodeNameInput = document.getElementById('nodeName');
+        const jsonDataInput = document.getElementById('jsonData');
+        const storeBtn = document.getElementById('storeBtn');
+        const validateBtn = document.getElementById('validateBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const urlList = document.getElementById('urlList');
+        const emptyState = document.getElementById('emptyState');
+        const totalCount = document.getElementById('totalCount');
+        const findInput = document.getElementById('findInput');
+        const findPrevBtn = document.getElementById('findPrevBtn');
+        const findNextBtn = document.getElementById('findNextBtn');
+        const findResults = document.getElementById('findResults');
+        const jsonDataContainer = document.getElementById('jsonDataContainer');
+        const findMatchCount = document.getElementById('findMatchCount');
+
+        // Store current URL data for editing
+        let savedUrls = JSON.parse(localStorage.getItem('savedUrls')) || [];
+        let isEditing = false;
+        let editingIndex = -1;
+        
+        // Find feature variables
+        let findMatches = [];
+        let currentMatchIndex = -1;
+        let findTimeout = null;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            renderUrlList();
+            
+            // Event listeners
+            storeBtn.addEventListener('click', storeData);
+            validateBtn.addEventListener('click', validateJSON);
+            clearBtn.addEventListener('click', clearForm);
+            
+            // Find feature event listeners
+            findInput.addEventListener('input', handleFindInput);
+            findPrevBtn.addEventListener('click', findPrevious);
+            findNextBtn.addEventListener('click', findNext);
+        });
+
+        // Find feature functions
+        function handleFindInput() {
+            // Clear previous timeout
+            if (findTimeout) {
+                clearTimeout(findTimeout);
+            }
+            
+            // Set a new timeout to perform the search after user stops typing
+            findTimeout = setTimeout(() => {
+                performFind();
+            }, 300); // 300ms delay after user stops typing
+            
+            // Update UI immediately to show we're searching
+            if (findInput.value) {
+                jsonDataContainer.classList.add('find-active');
+            } else {
+                jsonDataContainer.classList.remove('find-active');
+                clearFindResults();
+            }
+        }
+        
+        function performFind() {
+            const searchText = findInput.value;
+            if (!searchText) {
+                clearFindResults();
+                return;
+            }
+            
+            const text = jsonDataInput.value;
+            findMatches = [];
+            currentMatchIndex = -1;
+            
+            // Case-insensitive search
+            const regex = new RegExp(escapeRegExp(searchText), 'gi');
+            let match;
+            
+            while ((match = regex.exec(text)) !== null) {
+                findMatches.push({
+                    index: match.index,
+                    length: match[0].length
+                });
+            }
+            
+            updateFindResults();
+            
+            if (findMatches.length > 0) {
+                currentMatchIndex = 0;
+                highlightCurrentMatch();
+            } else {
+                findMatchCount.textContent = "No matches found";
+            }
+        }
+        
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+        
+        function findNext() {
+            if (findMatches.length === 0) return;
+            
+            currentMatchIndex = (currentMatchIndex + 1) % findMatches.length;
+            highlightCurrentMatch();
+        }
+        
+        function findPrevious() {
+            if (findMatches.length === 0) return;
+            
+            currentMatchIndex = (currentMatchIndex - 1 + findMatches.length) % findMatches.length;
+            highlightCurrentMatch();
+        }
+        
+        function highlightCurrentMatch() {
+            if (currentMatchIndex < 0 || currentMatchIndex >= findMatches.length) return;
+            
+            const match = findMatches[currentMatchIndex];
+            
+            // Scroll to the match
+            jsonDataInput.focus();
+            jsonDataInput.setSelectionRange(match.index, match.index + match.length);
+            
+            // Update results display
+            updateFindResults();
+        }
+        
+        function updateFindResults() {
+            if (findMatches.length === 0) {
+                findResults.textContent = "No matches found";
+                findMatchCount.textContent = "No matches";
+            } else {
+                findResults.textContent = `${currentMatchIndex + 1} of ${findMatches.length} matches`;
+                findMatchCount.textContent = `${currentMatchIndex + 1}/${findMatches.length}`;
+            }
+        }
+        
+        function clearFindResults() {
+            findMatches = [];
+            currentMatchIndex = -1;
+            findResults.textContent = "";
+            findMatchCount.textContent = "";
+        }
+
+        // Function to generate a unique ID
+        function generateUniqueId() {
+            return 'entry_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Function to store data in Firebase and generate URL
+        function storeData() {
+            const jsonData = jsonDataInput.value.trim();
+            
+            // Validate inputs
+            if (!jsonData) {
+                showStatus('Please enter JSON data.', 'error');
+                return;
+            }
+            
+            // Validate JSON
+            let parsedData;
+            try {
+                parsedData = JSON.parse(jsonData);
+            } catch (error) {
+                showStatus('Invalid JSON format. Please check your data.', 'error');
+                return;
+            }
+            
+            let nodeName;
+            
+            // If editing, use the existing nodeName
+            if (isEditing && editingIndex !== -1) {
+                nodeName = savedUrls[editingIndex].nodeName;
+            } else {
+                // Use user-provided node name or generate unique ID
+                const userNodeName = nodeNameInput.value.trim();
+                if (userNodeName) {
+                    // Validate node name (only alphanumeric, underscores, and hyphens)
+                    if (/^[a-zA-Z0-9_-]+$/.test(userNodeName)) {
+                        nodeName = userNodeName;
+                    } else {
+                        showStatus('Node name can only contain letters, numbers, underscores, and hyphens.', 'error');
+                        return;
+                    }
+                } else {
+                    nodeName = generateUniqueId();
+                }
+            }
+            
+            // Store data in Firebase
+            database.ref(nodeName).set(parsedData)
+                .then(() => {
+                    const baseUrl = "https://adr-catering-default-rtdb.firebaseio.com";
+                    const formattedJsonUrl = `${baseUrl}/${nodeName}.json`;
+                    
+                    // Create URL data
+                    const urlData = {
+                        nodeName: nodeName,
+                        formattedUrl: formattedJsonUrl,
+                        name: urlNameInput.value.trim() || `Entry ${savedUrls.length + 1}`,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    if (isEditing) {
+                        // Update existing entry
+                        savedUrls[editingIndex] = urlData;
+                        showStatus(`JSON URL updated successfully!`, 'success');
+                        
+                        // Reset editing mode
+                        isEditing = false;
+                        editingIndex = -1;
+                        storeBtn.innerHTML = '<i class="fas fa-bolt"></i> Generate JSON URL';
+                        storeBtn.classList.add('pulse');
+                    } else {
+                        // Add new entry
+                        savedUrls.unshift(urlData); // Add to beginning of array
+                        showStatus(`JSON URL generated and saved successfully!`, 'success');
+                        
+                        // Copy URL to clipboard
+                        copyToClipboard(formattedJsonUrl);
+                    }
+                    
+                    // Save to localStorage
+                    localStorage.setItem('savedUrls', JSON.stringify(savedUrls));
+                    
+                    // Update stats
+                    updateStats();
+                    
+                    // Refresh the URL list
+                    renderUrlList();
+                    
+                    // Clear the form
+                    clearForm();
+                })
+                .catch((error) => {
+                    showStatus(`Error storing data: ${error.message}`, 'error');
+                });
+        }
+
+        // Function to copy text to clipboard
+        function copyToClipboard(text) {
+            const tempInput = document.createElement('input');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+        }
+
+        // Function to update stats
+        function updateStats() {
+            totalCount.textContent = savedUrls.length;
+        }
+
+        // Function to render the URL list
+        function renderUrlList() {
+            if (savedUrls.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            urlList.innerHTML = '';
+            
+            savedUrls.forEach((url, index) => {
+                const urlItem = document.createElement('div');
+                urlItem.className = 'url-item slide-in';
+                urlItem.innerHTML = `
+                    <div class="url-header">
+                        <div class="url-name">
+                            <i class="fas fa-json"></i>
+                            ${url.name}
+                        </div>
+                        <div class="url-actions">
+                            <button class="btn-info copy-json-link" data-index="${index}">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button class="btn-warning edit-url" data-index="${index}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-danger delete-url" data-index="${index}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="url-meta">
+                        <span><i class="far fa-clock"></i> ${new Date(url.timestamp).toLocaleString()}</span>
+                    </div>
+                `;
+                
+                urlList.appendChild(urlItem);
+            });
+            
+            // Add event listeners to the buttons
+            document.querySelectorAll('.edit-url').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    editUrl(index);
+                });
+            });
+            
+            document.querySelectorAll('.delete-url').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    deleteUrl(index);
+                });
+            });
+            
+            document.querySelectorAll('.copy-json-link').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    copyJsonLink(index);
+                });
+            });
+        }
+
+        // Function to copy JSON link to clipboard
+        function copyJsonLink(index) {
+            const url = savedUrls[index];
+            copyToClipboard(url.formattedUrl);
+            showStatus('JSON URL copied to clipboard!', 'success');
+        }
+
+        // Function to edit a saved URL
+        function editUrl(index) {
+            const url = savedUrls[index];
+            
+            // Populate the form with the URL data
+            urlNameInput.value = url.name;
+            nodeNameInput.value = url.nodeName;
+            
+            // Fetch the current data from Firebase
+            database.ref(url.nodeName).once('value')
+                .then(snapshot => {
+                    const data = snapshot.val();
+                    jsonDataInput.value = JSON.stringify(data, null, 2);
+                    
+                    // Set editing mode
+                    isEditing = true;
+                    editingIndex = index;
+                    storeBtn.innerHTML = '<i class="fas fa-save"></i> Update JSON URL';
+                    storeBtn.classList.remove('pulse');
+                    
+                    showStatus('JSON data loaded for editing.', 'success');
+                    
+                    // Scroll to the form
+                    document.querySelector('.section').scrollIntoView({ behavior: 'smooth' });
+                })
+                .catch(error => {
+                    showStatus(`Error loading data: ${error.message}`, 'error');
+                });
+        }
+
+        // Function to delete a URL from the list
+        function deleteUrl(index) {
+            if (confirm('Are you sure you want to delete this JSON URL?')) {
+                // Also delete from Firebase
+                const url = savedUrls[index];
+                database.ref(url.nodeName).remove()
+                    .then(() => {
+                        savedUrls.splice(index, 1);
+                        localStorage.setItem('savedUrls', JSON.stringify(savedUrls));
+                        updateStats();
+                        renderUrlList();
+                        showStatus('JSON URL deleted successfully.', 'success');
+                    })
+                    .catch(error => {
+                        showStatus(`Error deleting from Firebase: ${error.message}`, 'error');
+                    });
+            }
+        }
+
+        // Function to validate JSON
+        function validateJSON() {
+            const jsonData = jsonDataInput.value.trim();
+            
+            if (!jsonData) {
+                showStatus('Please enter JSON data to validate.', 'error');
+                return;
+            }
+            
+            try {
+                JSON.parse(jsonData);
+                showStatus('JSON is valid!', 'success');
+            } catch (error) {
+                showStatus(`Invalid JSON: ${error.message}`, 'error');
+            }
+        }
+
+        // Function to clear the form
+        function clearForm() {
+            urlNameInput.value = '';
+            nodeNameInput.value = '';
+            jsonDataInput.value = '';
+            isEditing = false;
+            editingIndex = -1;
+            storeBtn.innerHTML = '<i class="fas fa-bolt"></i> Generate JSON URL';
+            storeBtn.classList.add('pulse');
+            hideStatus();
+            
+            // Clear find results
+            clearFindResults();
+            findInput.value = '';
+            jsonDataContainer.classList.remove('find-active');
+        }
+
+        // Function to show status message
+        function showStatus(message, type) {
+            statusMessage.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            statusMessage.className = `status ${type}`;
+            statusMessage.style.display = 'flex';
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(hideStatus, 5000);
+            }
+        }
+
+        // Function to hide status message
+        function hideStatus() {
+            statusMessage.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
